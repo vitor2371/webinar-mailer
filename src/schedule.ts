@@ -32,10 +32,8 @@ interface TimeSpec {
   minute: number;
 }
 
-const TIME_SPECS: Record<
-  Exclude<StepKey, 'CONFIRM' | 'WA'>,
-  TimeSpec
-> = {
+const TIME_SPECS: Record<Exclude<StepKey, 'CONFIRM'>, TimeSpec> = {
+  WA: { dayOffset: -2, hour: 19, minute: 0 }, // segunda, 19:00 (2 dias antes da quarta)
   TUE: { dayOffset: -1, hour: 9, minute: 0 },
   WED10: { dayOffset: 0, hour: 10, minute: 0 },
   WED1830: { dayOffset: 0, hour: 18, minute: 30 },
@@ -47,25 +45,11 @@ const TIME_SPECS: Record<
 
 export type Target =
   | { kind: 'immediate' } // CONFIRM: vence assim que o contato existe
-  | { kind: 'pending' } //   WA aguardando o CONFIRM sair
   | { kind: 'at'; at: Date }; // horario-alvo concreto (instante UTC)
 
-// Calcula o alvo de um step para um contato.
-// dataWebinar = "YYYY-MM-DD" (a quarta do contato). confirmSentAt = ISO do envio do CONFIRM (ou undefined).
-export function targetForStep(
-  step: StepKey,
-  dataWebinar: string,
-  confirmSentAt: string | undefined,
-): Target {
+// Calcula o alvo de um step para um contato. dataWebinar = "YYYY-MM-DD" (a quarta do contato).
+export function targetForStep(step: StepKey, dataWebinar: string): Target {
   if (step === 'CONFIRM') return { kind: 'immediate' };
-
-  if (step === 'WA') {
-    if (!confirmSentAt) return { kind: 'pending' };
-    const base = new Date(confirmSentAt).getTime();
-    if (Number.isNaN(base)) return { kind: 'pending' };
-    return { kind: 'at', at: new Date(base + 3 * 60 * 60 * 1000) };
-  }
-
   const spec = TIME_SPECS[step];
   const ymd = addDaysYmd(dataWebinar, spec.dayOffset);
   const { y, m, d } = parseYmd(ymd);

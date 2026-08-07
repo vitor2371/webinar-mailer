@@ -2,16 +2,9 @@ name: webinar-mailer-worker
 
 on:
   schedule:
-    # Ritmo base: a cada 30 min. Cobre os emails sem exigencia de precisao ao minuto
-    # (CONFIRM, WA, TUE, WED10, THU09, FRI09, FRI20). Barato: cabe no gratis do repo privado.
-    - cron: '*/30 * * * *'
-    # Rajada de precisao na QUARTA (dia-da-semana 3), a cada 2 min, nas horas UTC 16-18.
-    # E para os emails cravados: "em 30 min" (18:30 Berlim) e "ao vivo" (19:00 Berlim).
-    # Cobre horario de verao e inverno da Alemanha:
-    #   18:30 Berlim = 16:30 UTC (verao CEST) / 17:30 UTC (inverno CET)
-    #   19:00 Berlim = 17:00 UTC (verao CEST) / 18:00 UTC (inverno CET)
-    - cron: '*/2 16-18 * * 3'
+    # A cada 5 min (o intervalo minimo que o GitHub honra). Repo publico = minutos ilimitados.
     # OBS: o agendador do GitHub tem jitter de alguns minutos; nao e preciso ao segundo.
+    - cron: '*/5 * * * *'
   workflow_dispatch: {} # permite rodar manualmente pela aba Actions
 
 # Evita duas execucoes simultaneas (que poderiam mandar email duplicado).

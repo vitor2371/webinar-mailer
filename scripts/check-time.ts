@@ -4,10 +4,8 @@ import { STEP_ORDER, targetForStep } from '../src/schedule.js';
 import { TZ } from '../src/config.js';
 
 const dataWebinar = process.argv[2] ?? '2026-08-12'; // uma quarta qualquer
-const confirmSentAt = new Date().toISOString();
 
-console.log(`DATA_WEBINAR (W) = ${dataWebinar}  |  fuso ${TZ}`);
-console.log(`CONFIRM_SENT_AT (simulado) = ${confirmSentAt}\n`);
+console.log(`DATA_WEBINAR (W) = ${dataWebinar}  |  fuso ${TZ}\n`);
 
 const fmt = new Intl.DateTimeFormat('de-DE', {
   timeZone: TZ,
@@ -20,11 +18,9 @@ const fmt = new Intl.DateTimeFormat('de-DE', {
 });
 
 for (const step of STEP_ORDER) {
-  const t = targetForStep(step, dataWebinar, confirmSentAt);
+  const t = targetForStep(step, dataWebinar);
   if (t.kind === 'immediate') {
     console.log(`${step.padEnd(8)} imediato (ao existir o contato)`);
-  } else if (t.kind === 'pending') {
-    console.log(`${step.padEnd(8)} pendente (aguarda CONFIRM)`);
   } else {
     console.log(`${step.padEnd(8)} ${fmt.format(t.at)}  (UTC ${t.at.toISOString()})`);
   }

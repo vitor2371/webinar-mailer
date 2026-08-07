@@ -1,4 +1,5 @@
 import type { StepKey } from './schedule.js';
+import { MONDAY_EMAIL_HTML } from './email-monday.js';
 
 // --- Brevo / negocio (valores fixos do brief) ---
 export const BREVO_BASE = 'https://api.brevo.com/v3';
@@ -31,7 +32,8 @@ export interface EmailDef {
   key: StepKey;
   templateName: string;
   subject: string;
-  url: string;
+  url?: string; // busca o HTML desta URL...
+  html?: string; // ...ou usa este HTML inline (tem prioridade sobre url)
 }
 
 export const EMAILS: EmailDef[] = [
@@ -43,9 +45,9 @@ export const EMAILS: EmailDef[] = [
   },
   {
     key: 'WA',
-    templateName: 'Webinar 02 WhatsApp',
-    subject: 'Noch ein Schritt, um Ihren Webinar-Link zu erhalten',
-    url: 'https://webinar.megamemory.online/email-exports/webinar-whatsapp-reminder.html',
+    templateName: 'Webinar 02 Montag',
+    subject: 'Was die Schule Ihnen nie beigebracht hat',
+    html: MONDAY_EMAIL_HTML,
   },
   {
     key: 'TUE',

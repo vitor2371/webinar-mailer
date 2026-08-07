@@ -88,14 +88,11 @@ async function main() {
       dataWebinar = nextWebinarWednesdayYmd(now);
       stamps.push({ email: c.email, date: dataWebinar });
     }
-    const confirmSentAt: string | undefined = attrs[CONFIRM_SENT_AT_ATTR] || undefined;
-
     for (const step of STEP_ORDER) {
       const flag = attrs[wstepAttr(step)];
       if (flag && flag === dataWebinar) continue; // ja enviado nesta semana
 
-      const target = targetForStep(step, dataWebinar, confirmSentAt);
-      if (target.kind === 'pending') continue; // WA esperando o CONFIRM
+      const target = targetForStep(step, dataWebinar);
       if (target.kind === 'immediate') {
         plans.push({ email: c.email, step, action: 'send', dataWebinar });
         continue;
@@ -107,7 +104,7 @@ async function main() {
     }
 
     if (AUTO_ROLLOVER) {
-      const fri20 = targetForStep('FRI20', dataWebinar, confirmSentAt);
+      const fri20 = targetForStep('FRI20', dataWebinar);
       const fri20Flag = attrs[wstepAttr('FRI20')];
       if (fri20.kind === 'at' && fri20Flag === dataWebinar && now.getTime() > fri20.at.getTime()) {
         rollovers.push({ email: c.email, from: dataWebinar, to: nextWednesday(dataWebinar) });

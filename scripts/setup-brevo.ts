@@ -73,7 +73,7 @@ async function main() {
   const mapping: Record<string, number> = {};
 
   for (const def of EMAILS) {
-    const htmlContent = await fetchHtml(def.url);
+    const htmlContent = def.html ?? (await fetchHtml(def.url!));
     const payload = {
       templateName: def.templateName,
       subject: def.subject,
