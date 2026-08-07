@@ -89,6 +89,12 @@ export class BrevoClient {
       `/contacts/lists/${listId}/contacts?limit=${limit}&offset=${offset}`,
     );
   }
+  getContact(email: string) {
+    return this.req<{ attributes?: Record<string, any> }>(
+      'GET',
+      `/contacts/${encodeURIComponent(email)}`,
+    );
+  }
   updateContact(email: string, attributes: Record<string, unknown>) {
     return this.req('PUT', `/contacts/${encodeURIComponent(email)}`, { attributes });
   }

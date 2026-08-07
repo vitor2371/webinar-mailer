@@ -142,10 +142,30 @@ async function main() {
         console.error(`  ! sem templateId para ${p.step}; rode o setup. Pulando.`);
         continue;
       }
-      await brevo.sendTransactional({ to: [{ email: p.email }], templateId });
+
+      // ANOTA PRIMEIRO: grava o flag "ja enviei" ANTES de mandar.
       const upd: Record<string, unknown> = { [wstepAttr(p.step)]: p.dataWebinar };
       if (p.step === 'CONFIRM') upd[CONFIRM_SENT_AT_ATTR] = now.toISOString();
       await brevo.updateContact(p.email, upd);
+
+      // CONFERE que a anotacao colou de verdade (defesa contra o Brevo
+      // aceitar a gravacao mas nao persistir, como ocorreu na instabilidade de IP).
+      const check = await brevo.getContact(p.email);
+      if (check.attributes?.[wstepAttr(p.step)] !== p.dataWebinar) {
+        console.error(
+          `  ! flag ${wstepAttr(p.step)} NAO persistiu para ${p.email}; NAO envio ${p.step} para evitar duplicata. Tento na proxima rodada.`,
+        );
+        continue;
+      }
+
+      // So agora envia. Se o envio falhar, no maximo perde-se 1 email (raro), nunca duplica.
+      try {
+        await brevo.sendTransactional({ to: [{ email: p.email }], templateId });
+      } catch (e: any) {
+        console.error(
+          `  ! ${p.step} para ${p.email} falhou no ENVIO apos anotar (${e?.message ?? e}). Ja marcado; verifique manualmente.`,
+        );
+      }
       await sleep(SEND_DELAY_MS);
     } else {
       // atrasado demais: marca como enviado sem disparar
