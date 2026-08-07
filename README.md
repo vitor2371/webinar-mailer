@@ -6,7 +6,7 @@ O webinário é toda **quarta às 19:00 (Europe/Berlin)**. A régua tem 9 emails
 
 ## Como funciona (resumo)
 
-- Um worker roda a cada 15 min. Ele lê os contatos da lista **3**, olha `DATA_WEBINAR` e os flags `WSTEP_*`, e decide o que disparar. Contato sem `DATA_WEBINAR` recebe automaticamente a próxima quarta.
+- Um worker roda em dois ritmos: **a cada 30 min** (base) e **a cada 2 min na quarta à noite** (para os emails cravados das 18:30 e 19:00, horário de Berlim). Ele lê os contatos da lista **3**, olha `DATA_WEBINAR` e os flags `WSTEP_*`, e decide o que disparar. Contato sem `DATA_WEBINAR` recebe automaticamente a próxima quarta.
 - Um step só é enviado se `WSTEP_<STEP>` for **diferente** de `DATA_WEBINAR` (ou vazio). Depois de enviar, grava `WSTEP_<STEP> = DATA_WEBINAR`.
 - Quando a `DATA_WEBINAR` do contato muda (vira a semana), os flags deixam de bater e a régua roda de novo sozinha.
 - Se um horário-alvo já passou há mais de **6 horas** (worker ficou fora do ar), o step é **marcado como enviado sem disparar**, para não mandar email muito atrasado.
@@ -99,7 +99,7 @@ Manda 1 email de cada step para `TEST_EMAIL`. Valide o visual e o cabeçalho (SP
 
 ### 6. Ligar o cron (GitHub Actions, recomendado)
 
-Escolhi **GitHub Actions** por ser grátis e sem servidor. O arquivo `.github/workflows/worker.yml` já roda a cada 15 min.
+Escolhi **GitHub Actions** por ser grátis e sem servidor. O arquivo `.github/workflows/worker.yml` roda em dois ritmos: base a cada 30 min, mais uma rajada a cada 2 min na quarta à noite (UTC 16-18h) para acertar no horário os emails "em 30 min" (18:30) e "ao vivo" (19:00) de Berlim, cobrindo verão e inverno. Esse desenho cabe no limite grátis de um repositório **privado** (2000 min/mês). Cuidado ao aumentar a frequência: em repo privado isso pode passar do grátis; em repo público o Actions é ilimitado.
 
 1. Suba o repositório no GitHub (com o `brevo-templates.json` commitado).
 2. Em *Settings > Secrets and variables > Actions*, crie o secret **`BREVO_API_KEY`**.

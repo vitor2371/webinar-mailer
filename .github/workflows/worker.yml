@@ -2,10 +2,16 @@ name: webinar-mailer-worker
 
 on:
   schedule:
-    # A cada 5 minutos. (O agendador do GitHub Actions pode atrasar sob carga;
-    # a logica de janela + skip de atrasados no worker tolera isso.)
-    # Nota: 5 min so e gratis em repositorio PUBLICO. Em privado, use >= 30 min.
-    - cron: '*/5 * * * *'
+    # Ritmo base: a cada 30 min. Cobre os emails sem exigencia de precisao ao minuto
+    # (CONFIRM, WA, TUE, WED10, THU09, FRI09, FRI20). Barato: cabe no gratis do repo privado.
+    - cron: '*/30 * * * *'
+    # Rajada de precisao na QUARTA (dia-da-semana 3), a cada 2 min, nas horas UTC 16-18.
+    # E para os emails cravados: "em 30 min" (18:30 Berlim) e "ao vivo" (19:00 Berlim).
+    # Cobre horario de verao e inverno da Alemanha:
+    #   18:30 Berlim = 16:30 UTC (verao CEST) / 17:30 UTC (inverno CET)
+    #   19:00 Berlim = 17:00 UTC (verao CEST) / 18:00 UTC (inverno CET)
+    - cron: '*/2 16-18 * * 3'
+    # OBS: o agendador do GitHub tem jitter de alguns minutos; nao e preciso ao segundo.
   workflow_dispatch: {} # permite rodar manualmente pela aba Actions
 
 # Evita duas execucoes simultaneas (que poderiam mandar email duplicado).
@@ -22,6 +28,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
+          cache: 'npm'
       - run: npm ci
       - run: npm run build
       - name: Rodar worker
