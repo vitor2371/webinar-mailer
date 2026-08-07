@@ -61,9 +61,11 @@ export class BrevoClient {
     return json as T;
   }
 
-  // Atributos de contato
+  // Atributos de contato. Categoria "normal" = campo por contato (o que queremos).
+  // ATENCAO: "global" e valor unico da conta e o Brevo IGNORA silenciosamente ao
+  // gravar no contato (o PUT retorna 204 mas nao persiste). Tem que ser "normal".
   createAttribute(name: string, type: 'date' | 'text' | 'float' | 'boolean') {
-    return this.req('POST', `/contacts/attributes/global/${name}`, { type });
+    return this.req('POST', `/contacts/attributes/normal/${name}`, { type });
   }
 
   // Templates transacionais
