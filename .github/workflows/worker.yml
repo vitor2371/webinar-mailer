@@ -1,0 +1,31 @@
+name: webinar-mailer-worker
+
+on:
+  schedule:
+    # A cada 15 minutos. (O agendador do GitHub Actions pode atrasar sob carga;
+    # a logica de janela + skip de atrasados no worker tolera isso.)
+    - cron: '*/15 * * * *'
+  workflow_dispatch: {} # permite rodar manualmente pela aba Actions
+
+# Evita duas execucoes simultaneas (que poderiam mandar email duplicado).
+concurrency:
+  group: webinar-mailer-worker
+  cancel-in-progress: false
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - run: npm ci
+      - run: npm run build
+      - name: Rodar worker
+        env:
+          BREVO_API_KEY: ${{ secrets.BREVO_API_KEY }}
+          AUTO_ROLLOVER: '0' # mude para '1' quando quiser ligar a renovacao semanal automatica
+          SEND_DELAY_MS: '150'
+        run: node dist/src/worker.js

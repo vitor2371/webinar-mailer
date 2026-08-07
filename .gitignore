@@ -1,0 +1,7 @@
+node_modules/
+dist/
+.env
+*.log
+
+# brevo-templates.json is intentionally NOT ignored: the worker needs it,
+# so commit it after running the setup script.
