@@ -2,9 +2,10 @@ name: webinar-mailer-worker
 
 on:
   schedule:
-    # A cada 15 minutos. (O agendador do GitHub Actions pode atrasar sob carga;
+    # A cada 5 minutos. (O agendador do GitHub Actions pode atrasar sob carga;
     # a logica de janela + skip de atrasados no worker tolera isso.)
-    - cron: '*/15 * * * *'
+    # Nota: 5 min so e gratis em repositorio PUBLICO. Em privado, use >= 30 min.
+    - cron: '*/5 * * * *'
   workflow_dispatch: {} # permite rodar manualmente pela aba Actions
 
 # Evita duas execucoes simultaneas (que poderiam mandar email duplicado).
