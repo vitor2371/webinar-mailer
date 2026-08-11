@@ -9,6 +9,12 @@ import {
   wstepAttr,
 } from '../src/config.js';
 import { STEP_ORDER } from '../src/schedule.js';
+import { withUnsubFooter } from '../src/unsubscribe.js';
+import {
+  PURCHASE_SUBJECT,
+  PURCHASE_TEMPLATE_NAME,
+  PURCHASE_WELCOME_HTML,
+} from '../src/purchase-email.js';
 
 async function ensureAttribute(
   brevo: BrevoClient,
@@ -72,28 +78,39 @@ async function main() {
   const existing = await loadExistingTemplates(brevo);
   const mapping: Record<string, number> = {};
 
-  for (const def of EMAILS) {
-    const htmlContent = def.html ?? (await fetchHtml(def.url!));
+  // Helper: cria ou atualiza um template por nome, com o rodape de unsubscribe anexado.
+  async function upsertTemplate(name: string, subject: string, rawHtml: string): Promise<number> {
     const payload = {
-      templateName: def.templateName,
-      subject: def.subject,
-      htmlContent,
+      templateName: name,
+      subject,
+      htmlContent: withUnsubFooter(rawHtml),
       sender: SENDER,
       replyTo: REPLY_TO_EMAIL,
       isActive: true,
     };
-
-    const existingId = existing.get(def.templateName);
+    const existingId = existing.get(name);
     if (existingId) {
       await brevo.updateTemplate(existingId, payload);
-      mapping[def.key] = existingId;
-      console.log(`  = atualizado: ${def.templateName} (id ${existingId})`);
-    } else {
-      const r = await brevo.createTemplate(payload);
-      mapping[def.key] = r.id;
-      console.log(`  + criado: ${def.templateName} (id ${r.id})`);
+      console.log(`  = atualizado: ${name} (id ${existingId})`);
+      return existingId;
     }
+    const r = await brevo.createTemplate(payload);
+    console.log(`  + criado: ${name} (id ${r.id})`);
+    return r.id;
   }
+
+  // Os 9 emails da regua do webinario.
+  for (const def of EMAILS) {
+    const rawHtml = def.html ?? (await fetchHtml(def.url!));
+    mapping[def.key] = await upsertTemplate(def.templateName, def.subject, rawHtml);
+  }
+
+  // Email de boas-vindas de COMPRA (fora da regua; disparado pelo webhook do Digistore).
+  mapping['PURCHASE_WELCOME'] = await upsertTemplate(
+    PURCHASE_TEMPLATE_NAME,
+    PURCHASE_SUBJECT,
+    PURCHASE_WELCOME_HTML,
+  );
 
   writeFileSync('brevo-templates.json', JSON.stringify(mapping, null, 2) + '\n');
   console.log('\nOK. brevo-templates.json gravado:');
