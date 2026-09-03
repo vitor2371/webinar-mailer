@@ -10,6 +10,9 @@ export type StepKey =
   | 'WED19'
   | 'THU09'
   | 'FRI09'
+  | 'FRI13'
+  | 'FRI19'
+  | 'SAT09'
   | 'FRI20';
 
 // Ordem cronologica em que os steps sao avaliados.
@@ -22,6 +25,9 @@ export const STEP_ORDER: StepKey[] = [
   'WED19',
   'THU09',
   'FRI09',
+  'FRI13',
+  'FRI19',
+  'SAT09',
   'FRI20',
 ];
 
@@ -40,6 +46,9 @@ const TIME_SPECS: Record<Exclude<StepKey, 'CONFIRM'>, TimeSpec> = {
   WED19: { dayOffset: 0, hour: 19, minute: 0 },
   THU09: { dayOffset: 1, hour: 9, minute: 0 },
   FRI09: { dayOffset: 2, hour: 9, minute: 0 },
+  FRI13: { dayOffset: 2, hour: 13, minute: 0 }, // sexta 13:00 — "Was die Schule..."
+  FRI19: { dayOffset: 2, hour: 19, minute: 0 }, // sexta 19:00 — "Diese E-Mail ist nicht für Sie"
+  SAT09: { dayOffset: 3, hour: 9, minute: 0 }, // sábado 09:00 — "Heute ist der letzte Tag"
   FRI20: { dayOffset: 3, hour: 20, minute: 0 }, // SÁBADO 20:00 (inscrições fecham sábado; o "fecha hoje/à meia-noite" do email vale de verdade agora)
 };
 

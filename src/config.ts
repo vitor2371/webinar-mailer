@@ -1,5 +1,10 @@
 import type { StepKey } from './schedule.js';
 import { MONDAY_EMAIL_HTML } from './email-monday.js';
+import {
+  OFFER_FRI_SCHULE_HTML,
+  OFFER_FRI_FAMILIE_HTML,
+  OFFER_SA_LETZTER_HTML,
+} from './email-offers.js';
 
 // --- Brevo / negocio (valores fixos do brief) ---
 export const BREVO_BASE = 'https://api.brevo.com/v3';
@@ -90,6 +95,24 @@ export const EMAILS: EmailDef[] = [
     templateName: 'Webinar 09 LastCall',
     subject: 'Heute Abend schließt es',
     url: 'https://webinar.megamemory.online/email-exports/webinar-seq-friday-evening.html',
+  },
+  {
+    key: 'FRI13',
+    templateName: 'Webinar 10 Fri Schule',
+    subject: 'Was die Schule Ihnen nie über das Gedächtnis beigebracht hat',
+    html: OFFER_FRI_SCHULE_HTML,
+  },
+  {
+    key: 'FRI19',
+    templateName: 'Webinar 11 Fri Familie',
+    subject: 'Diese E-Mail ist nicht für Sie',
+    html: OFFER_FRI_FAMILIE_HTML,
+  },
+  {
+    key: 'SAT09',
+    templateName: 'Webinar 12 Sa LetzterTag',
+    subject: 'Heute ist der letzte Tag',
+    html: OFFER_SA_LETZTER_HTML,
   },
 ];
 
