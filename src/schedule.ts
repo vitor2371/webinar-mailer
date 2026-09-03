@@ -40,7 +40,7 @@ const TIME_SPECS: Record<Exclude<StepKey, 'CONFIRM'>, TimeSpec> = {
   WED19: { dayOffset: 0, hour: 19, minute: 0 },
   THU09: { dayOffset: 1, hour: 9, minute: 0 },
   FRI09: { dayOffset: 2, hour: 9, minute: 0 },
-  FRI20: { dayOffset: 2, hour: 20, minute: 0 },
+  FRI20: { dayOffset: 3, hour: 20, minute: 0 }, // SÁBADO 20:00 (inscrições fecham sábado; o "fecha hoje/à meia-noite" do email vale de verdade agora)
 };
 
 export type Target =
